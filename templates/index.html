@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- ВСЁ ЧТО ХОЧЕШЬ ВИДЕТЬ НА СТРАНИЦЕ - ПИШЕШЬ ЗДЕСЬ -->
+
+<h1>Привет, епта!</h1>
+<h2>Тут ты можешь ввести ссылку, которую надо сократить</h2>
+
+<div>
+    <form method="post">
+        <p>
+            <label for='user_url'>Put your link here:</label>
+            <input id='user_url' type="text" name="user_url">
+        </p>
+        <button type='submit'>Создать</button>
+
+    </form>
+</div>
+
+<div>
+ {% if shortened_link %}
+    <div>
+        Your link for <a href="{{ orig_link }}" _blank=True>{{ orig_link }}</a> is <a href="{{ shortened_link }}" _blank=True>{{ shortened_link }}</a>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}
