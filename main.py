@@ -1,5 +1,6 @@
 import random
 import string
+from typing import Dict
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
@@ -78,12 +79,30 @@ class URLShortener:
 
 
 @app.route('/urls')
-def urls():
+def urls() -> dict[str: str]:
+    """
+    Show all handled and saved user link
+
+    Returns:
+        dict[str: str]: code for short link: user orig link
+    """
+
     return handler.urls_data
 
 
 @app.route('/redirect/<string:code>', methods=['GET'])
-def redirect_to(code):
+def redirect_to(code: str) -> redirect:
+    """
+    Find user link by this `code` and redirect from this page to saved user link
+
+
+    Args:
+        code (str): mean code, wich reference to some user link
+
+    Returns:
+        redirect: link to user site
+    """
+
     if request.method == 'GET':
         url_to_redirect = handler.urls_data.get(code)
 
@@ -91,7 +110,17 @@ def redirect_to(code):
 
 
 @app.route('/set', methods=['POST', 'GET'])
-def main():
+def main() -> render_template:
+    """
+    Main function, defines the conduction of creating short links
+    1. Get user link from form
+    2. Validate this input data
+    3. If ok - create short link for this link, save it to dict
+    4. Return page with rendered data (short link + original link)
+
+    Returns:
+        render_template: template with new info or empty form
+    """
     error = None
     shortened_link = None
     user_link = None
@@ -116,5 +145,4 @@ def main():
 
 if __name__ == '__main__':
     handler = URLShortener()
-
     app.run(debug=True)
