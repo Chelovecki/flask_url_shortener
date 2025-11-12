@@ -5,31 +5,61 @@ app = Flask(__name__)
 
 
 class URLShortener:
+    """
+    Class-helper, wich helps provide all main methods for generate, save, update links
+
+    1. Generate unique code for short link
+    2. Generate short link for user link
+    3. Save it link in way: short_code: user_link
+    4. If need - get user_link by short_code
+    """
+
     def __init__(self):
         self.symbols_for_short_link = string.digits + string.ascii_lowercase
         self.urls_data = {}
 
-    def _generate_short_code(self):
-        url = "".join([random.choice(self.symbols_for_short_link)
-                      for _ in range(6)])
-        return url
+    def _generate_short_code(self) -> str:
+        """
+        Generate unique short code with 6 symbols
+
+        Returns:
+            str: code for short link
+        """
+        while True:
+            code = "".join([random.choice(self.symbols_for_short_link)
+                            for _ in range(6)])
+            if code not in self.urls_data.keys():
+                return code
 
     def _get_unique_code(self, user_url):
         unique_code = self._generate_short_code()
 
-        yet_existed = None
-        for code, url in self.urls_data.items():
-            if url == user_url:
-                yet_existed = code
-                break
+        Checks if the user_url already has a short code in storage.
+        If found, returns the existing code. Otherwise generates a new code.
 
-        if not yet_existed:
-            yet_existed = unique_code
+        Args:
+            user_url (str): link wich user input on web
 
-        return yet_existed
+        Returns:
+            str: short code for short link
+        """
+        for existing_code, existing_url in self.urls_data.items():
+            if existing_url == user_url:
+                return existing_code
+
+        return self._generate_short_code()
 
     def get_short_link(self, user_url):
-        unique_code = self._get_unique_code(user_url)
+        """
+        Generate or retrieve short link for the given user URL.
+
+        Args:
+            user_url (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        code = self._get_code_of_user_url(user_url)
 
         self.set_user_link(user_link=user_url, code=unique_code)
 
