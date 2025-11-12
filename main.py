@@ -1,6 +1,7 @@
 import random
 import string
 from flask import Flask, redirect, render_template, request, url_for
+
 app = Flask(__name__)
 
 
@@ -31,8 +32,9 @@ class URLShortener:
             if code not in self.urls_data.keys():
                 return code
 
-    def _get_unique_code(self, user_url):
-        unique_code = self._generate_short_code()
+    def _get_code_of_user_url(self, user_url: str) -> str:
+        """
+        Get existing short code for user_url or generate new one if not exists.
 
         Checks if the user_url already has a short code in storage.
         If found, returns the existing code. Otherwise generates a new code.
@@ -61,10 +63,10 @@ class URLShortener:
         """
         code = self._get_code_of_user_url(user_url)
 
-        self.set_user_link(user_link=user_url, code=unique_code)
+        self.set_user_link(user_link=user_url, code=code)
 
         abs_url_with_short_link = url_for(
-            'redirect_to', unique_code=unique_code, _external=True)
+            'redirect_to', code=code, _external=True)
 
         return abs_url_with_short_link
 
@@ -80,10 +82,10 @@ def urls():
     return handler.urls_data
 
 
-@app.route('/redirect/<string:unique_code>', methods=['GET'])
-def redirect_to(unique_code):
+@app.route('/redirect/<string:code>', methods=['GET'])
+def redirect_to(code):
     if request.method == 'GET':
-        url_to_redirect = handler.urls_data.get(unique_code)
+        url_to_redirect = handler.urls_data.get(code)
 
         return redirect(url_to_redirect)
 
