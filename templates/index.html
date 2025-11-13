@@ -19,10 +19,47 @@
 
 <div>
  {% if shortened_link %}
-    <div>
-        Your short link is <a href="{{ shortened_link }}" _blank=True>{{ shortened_link }}</a> for <a href="{{ orig_link }}" _blank=True>{{ orig_link }}</a> 
-    </div>
-    {% endif %}
+<div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+    <p>Your short link is: 
+        <a href="{{ shortened_link }}" target="_blank" id="shortLink">{{ shortened_link }}</a>
+    </p>
+    <p>For original: <a href="{{ orig_link }}" target="_blank">{{ orig_link }}</a></p>
+    
+    <button onclick="copyShortLink()" style="padding: 8px 16px; margin-top: 10px;">
+        📋 Copy Short Link
+    </button>
+    <span id="copyMessage" style="margin-left: 10px; color: green;"></span>
+</div>
+
+<script>
+function copyShortLink() {
+    const shortLink = "{{ shortened_link }}";
+    
+    // Используем современный API
+    navigator.clipboard.writeText(shortLink).then(() => {
+        const message = document.getElementById('copyMessage');
+        message.textContent = 'Copied!';
+        setTimeout(() => {
+            message.textContent = '';
+        }, 2000);
+    }).catch(err => {
+        // Fallback для старых браузеров
+        const textArea = document.createElement('textarea');
+        textArea.value = shortLink;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        const message = document.getElementById('copyMessage');
+        message.textContent = 'Copied!';
+        setTimeout(() => {
+            message.textContent = '';
+        }, 2000);
+    });
+}
+</script>
+{% endif %}
 </div>
 
 
