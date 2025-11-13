@@ -1,81 +1,7 @@
-import random
-import string
-from typing import Dict
+from helpers import URLShortener
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-
-
-class URLShortener:
-    """
-    Class-helper, wich helps provide all main methods for generate, save, update links
-
-    1. Generate unique code for short link
-    2. Generate short link for user link
-    3. Save it link in way: short_code: user_link
-    4. If need - get user_link by short_code
-    """
-
-    def __init__(self):
-        self.symbols_for_short_link = string.digits + string.ascii_lowercase
-        self.urls_data = {}
-
-    def _generate_short_code(self) -> str:
-        """
-        Generate unique short code with 6 symbols
-
-        Returns:
-            str: code for short link
-        """
-        while True:
-            code = "".join([random.choice(self.symbols_for_short_link)
-                            for _ in range(6)])
-            if code not in self.urls_data.keys():
-                return code
-
-    def _get_code_of_user_url(self, user_url: str) -> str:
-        """
-        Get existing short code for user_url or generate new one if not exists.
-
-        Checks if the user_url already has a short code in storage.
-        If found, returns the existing code. Otherwise generates a new code.
-
-        Args:
-            user_url (str): link wich user input on web
-
-        Returns:
-            str: short code for short link
-        """
-        for existing_code, existing_url in self.urls_data.items():
-            if existing_url == user_url:
-                return existing_code
-
-        return self._generate_short_code()
-
-    def get_short_link(self, user_url):
-        """
-        Generate or retrieve short link for the given user URL.
-
-        Args:
-            user_url (_type_): _description_
-
-        Returns:
-            _type_: _description_
-        """
-        code = self._get_code_of_user_url(user_url)
-
-        self.set_user_link(user_link=user_url, code=code)
-
-        abs_url_with_short_link = url_for(
-            'redirect_to', code=code, _external=True)
-
-        return abs_url_with_short_link
-
-    def get_user_link(self, short_code):
-        return self.urls_data.get(short_code)
-
-    def set_user_link(self, user_link, code):
-        self.urls_data[code] = user_link
 
 
 @app.route('/urls')
@@ -87,7 +13,7 @@ def urls() -> dict[str: str]:
         dict[str: str]: code for short link: user orig link
     """
 
-    return handler.urls_data
+    return handler.code_url
 
 
 @app.route('/redirect/<string:code>', methods=['GET'])
@@ -103,10 +29,9 @@ def redirect_to(code: str) -> redirect:
         redirect: link to user site
     """
 
-    if request.method == 'GET':
-        url_to_redirect = handler.urls_data.get(code)
+    url_to_redirect = handler.code_url.get(code)
 
-        return redirect(url_to_redirect)
+    return redirect(url_to_redirect)
 
 
 @app.route('/set', methods=['POST', 'GET'])
@@ -138,11 +63,22 @@ def main() -> render_template:
 
         # все хорошо, обрабатываем полученную ссылку
         else:
-            shortened_link = handler.get_short_link(user_link)
+            shortened_link = get_short_link(user_link)
     print(error)
     return render_template('index.html', orig_link=user_link, shortened_link=shortened_link, error=error)
 
 
+def get_short_link(user_url):
+    code = handler.get_code_by_url(user_url)
+
+    handler.set_user_link(user_link=user_url, code=code)
+
+    abs_url_with_short_link = url_for('redirect_to', code=code, _external=True)
+
+    return abs_url_with_short_link
+
+
+handler = URLShortener()
+
 if __name__ == '__main__':
-    handler = URLShortener()
     app.run(debug=True)
