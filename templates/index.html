@@ -46,7 +46,10 @@
 <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
     <p>Your short link is: <a href="{{ shortened_link }}" target="_blank" id="shortLink">{{ shortened_link }}</a></p>
     <p>For original: <a href="{{ orig_link }}" target="_blank">{{ orig_link }}</a></p>
-    <p>This link will expire at {{ year }}-{{ month }}-{{ day }}</p>
+     <p>
+        This link will expire at <a href="https://calendar.google.com/calendar/r/day/{{ year }}/{{ month }}/{{ day }}" target="_blank">{{ year }}-{{ month }}-{{ day }}</a>
+
+    </p>
     
     <button onclick="copyShortLink()" style="padding: 8px 16px; margin-top: 10px;">
         📋 Copy Short Link
