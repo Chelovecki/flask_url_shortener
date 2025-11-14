@@ -1,3 +1,4 @@
+import datetime
 from helpers import URLShortener
 from flask import Flask, redirect, render_template, request, url_for
 
@@ -34,7 +35,7 @@ def redirect_to(code: str) -> redirect:
     return redirect(url_to_redirect)
 
 
-@app.route('/set', methods=['POST', 'GET'])
+@app.route('/shorten_url', methods=['POST', 'GET'])
 def main() -> render_template:
     """
     Main function, defines the conduction of creating short links
@@ -49,7 +50,7 @@ def main() -> render_template:
     error = None
     shortened_link = None
     user_link = None
-
+    # post запрос, обрабатываем введенные данные
     if request.method == 'POST':
         user_link = request.form.get('user_url')
 
@@ -64,8 +65,20 @@ def main() -> render_template:
         # все хорошо, обрабатываем полученную ссылку
         else:
             shortened_link = get_short_link(user_link)
-    print(error)
-    return render_template('index.html', orig_link=user_link, shortened_link=shortened_link, error=error)
+            year = int(request.form.get('year'))
+            month = int(request.form.get('month'))
+            day = int(request.form.get('day'))
+
+            now_data = datetime.datetime.now()
+
+            date_future = datetime.timedelta(days=day + month*30 + year*365)
+            link_expires_at = now_data + date_future
+            day_expire=link_expires_at.day
+            month_expire=link_expires_at.month
+            year_expire = link_expires_at.year
+
+    # get-запрос, показать пустую форму
+    return render_template('index.html', orig_link=user_link, shortened_link=shortened_link, error=error, day=day_expire, month=month_expire, year=year_expire)
 
 
 def get_short_link(user_url):
