@@ -1,12 +1,12 @@
 import datetime
-from helpers import URLShortener, get_date_expire
+from helpers import *
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
 
 
-@app.route('/urls')
-def urls() -> dict[str: str]:
+@app.route('/code_urls')
+def code_urls() -> dict[str: str]:
     """
     Show all handled and saved user link
 
@@ -60,6 +60,9 @@ def main() -> render_template:
     error = None
     shortened_link = None
     user_link = None
+    year_expire = 0
+    month_expire = 0
+    day_expire = 0
     # post запрос, обрабатываем введенные данные
     if request.method == 'POST':
         user_link = request.form.get('user_url')
@@ -76,15 +79,36 @@ def main() -> render_template:
         else:
             shortened_link = get_short_link(user_link)
 
-            year_expire, month_expire, day_expire = get_date_expire(
+            # получаем дату, когда истекает ссылка. Если она не сохранена - генерируем и сохраняем
+            date_expire = get_date_expire(
                 year=int(request.form.get('year')),
                 month=int(request.form.get('month')),
                 day=int(request.form.get('day'))
             )
-            
+
+            # если пользователь снова вставляет сслыку, но дата уже другая - это значит, что он хочет изменить длительность хранения
+            handler.set_date_expire(user_link, date_expire)
+
+            year_expire, month_expire, day_expire = extract_year_month_day(
+                date_expire)
+            print('---')
+            print(
+                f"from date: year:{request.form.get('year')}, month: {request.form.get('month')}, day: {request.form.get('day')}")
+            print("date_expire", date_expire)
+            print("year_expire", year_expire)
+            print("month_expire", month_expire)
+            print("day_expire", day_expire)
+            print('---')
 
     # get-запрос, показать пустую форму
-    return render_template('index.html', orig_link=user_link, shortened_link=shortened_link, error=error, day=day_expire, month=month_expire, year=year_expire)
+    return render_template('index.html',
+                           orig_link=user_link,
+                           shortened_link=shortened_link,
+                           error=error,
+                           day=day_expire,
+                           month=month_expire,
+                           year=year_expire
+                           )
 
 
 def get_short_link(user_url):
