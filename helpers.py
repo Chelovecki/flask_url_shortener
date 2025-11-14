@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import random
 import string
 import uuid
@@ -18,6 +18,7 @@ class URLShortener:
         self.symbols_for_short_link = string.digits + string.ascii_lowercase
         self.code_url = {}
         self.urls_code = {}
+        self.urls_date = {}
 
     def _generate_short_code(self, user_url) -> str:
         # for optimization we can send user_url for getting by key
@@ -50,15 +51,25 @@ class URLShortener:
         self.code_url[code] = user_link
         self.urls_code[user_link] = code
 
+    def set_date_expire(self, user_link: str, date: datetime):
+        self.urls_date[user_link] = date
 
-def get_date_expire(year: int, month: int, day: int):
+    def get_date_expire_from_dict(self, user_link: str) -> datetime:
+        return self.urls_date.get(user_link)
 
-    now_data = datetime.datetime.now()
 
-    date_future = datetime.timedelta(days=day + month*30 + year*365)
-    link_expires_at = now_data + date_future
-    day_expire = link_expires_at.day
-    month_expire = link_expires_at.month
-    year_expire = link_expires_at.year
+def get_date_expire(year: int, month: int, day: int) -> datetime:
     
+    now_data = datetime.now()
+
+    date_future = timedelta(days=day + month*30 + year*365)
+    link_expires_at = now_data + date_future
+
+    return link_expires_at
+
+
+def extract_year_month_day(date: datetime):
+    day_expire = date.day
+    month_expire = date.month
+    year_expire = date.year
     return year_expire, month_expire, day_expire
