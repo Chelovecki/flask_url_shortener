@@ -1,3 +1,4 @@
+import datetime
 import random
 import string
 import uuid
@@ -48,3 +49,16 @@ class URLShortener:
     def set_user_link(self, user_link, code):
         self.code_url[code] = user_link
         self.urls_code[user_link] = code
+
+
+def get_date_expire(year: int, month: int, day: int):
+
+    now_data = datetime.datetime.now()
+
+    date_future = datetime.timedelta(days=day + month*30 + year*365)
+    link_expires_at = now_data + date_future
+    day_expire = link_expires_at.day
+    month_expire = link_expires_at.month
+    year_expire = link_expires_at.year
+    
+    return year_expire, month_expire, day_expire

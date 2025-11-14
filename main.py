@@ -1,5 +1,5 @@
 import datetime
-from helpers import URLShortener
+from helpers import URLShortener, get_date_expire
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
@@ -65,17 +65,13 @@ def main() -> render_template:
         # все хорошо, обрабатываем полученную ссылку
         else:
             shortened_link = get_short_link(user_link)
-            year = int(request.form.get('year'))
-            month = int(request.form.get('month'))
-            day = int(request.form.get('day'))
 
-            now_data = datetime.datetime.now()
-
-            date_future = datetime.timedelta(days=day + month*30 + year*365)
-            link_expires_at = now_data + date_future
-            day_expire=link_expires_at.day
-            month_expire=link_expires_at.month
-            year_expire = link_expires_at.year
+            year_expire, month_expire, day_expire = get_date_expire(
+                year=int(request.form.get('year')),
+                month=int(request.form.get('month')),
+                day=int(request.form.get('day'))
+            )
+            
 
     # get-запрос, показать пустую форму
     return render_template('index.html', orig_link=user_link, shortened_link=shortened_link, error=error, day=day_expire, month=month_expire, year=year_expire)
