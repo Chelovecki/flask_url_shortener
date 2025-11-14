@@ -17,6 +17,16 @@ def urls() -> dict[str: str]:
     return handler.code_url
 
 
+@app.route('/urls_code')
+def urls_code() -> dict[str: str]:
+    return handler.urls_code
+
+
+@app.route('/urls_date')
+def urls_date() -> dict[str: str]:
+    return handler.urls_date
+
+
 @app.route('/redirect/<string:code>', methods=['GET'])
 def redirect_to(code: str) -> redirect:
     """
