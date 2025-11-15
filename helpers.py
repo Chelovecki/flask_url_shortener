@@ -22,9 +22,6 @@ class URLShortener:
         def generate_by_uuid64():
             return str(uuid.uuid4())[:5]
 
-        def generate_by_randomchoise():
-            return "".join([random.choice(self.symbols_for_short_link)])
-
         # for optimization we can send user_url for getting by key
         while True:
             code = generate_by_uuid64()
