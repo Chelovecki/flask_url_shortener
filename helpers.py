@@ -1,5 +1,6 @@
 import random
 import string
+import uuid
 
 
 class URLShortener:
@@ -18,10 +19,13 @@ class URLShortener:
         self.urls_code = {}
 
     def _generate_short_code(self, user_url) -> str:
+        def generate_by_uuid64():
+            return str(uuid.uuid4())[:5]
+
         # for optimization we can send user_url for getting by key
         while True:
-            code = "".join([random.choice(self.symbols_for_short_link)
-                            for _ in range(6)])
+            code = generate_by_uuid64()
+
             if self.urls_code.get(user_url) is None:
                 return code
 
